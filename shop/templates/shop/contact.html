@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}ارتباط با ما{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="card bg-dark mt-5 p-5">
+        <form method="POST">
+            {% csrf_token %}
+            <h1 class="text-center" style="color: goldenrod;">ارتباط با ما</h1>
+            <div class="row mt-3">
+                <div class="col-6">
+                    <input type="text" name="subject" placeholder="موضوع" class="form-control" required>
+                </div>
+                <div class="col-6">
+                    <input type="email" name="email" placeholder="ایمیل" class="form-control" required>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <textarea name="message" rows="5" placeholder="متن" class="form-control" required></textarea>
+            </div>
+            <button class="btn btn-danger mt-3" type="submit">ارسال</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

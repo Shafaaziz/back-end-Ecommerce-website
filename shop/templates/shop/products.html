@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+
+{% block title %}محصولات{% endblock %}
+
+
+{% block body %}
+<main>
+    <div class="container">
+        <form method="POST", action="{% url 'product_search' %}">
+            {% csrf_token %}
+            {{form}}
+            <button type="submit">جستوجو</button>
+        </form>
+        <h1>محصولات</h1>
+        {% for product in product %}
+        <a style="text-decoration: none;" href="{% url 'detail' product.id %}">
+        <h2>{{product.name}}</h2>
+        
+        <img src="{{ product.image.url }}" style="width: 200px ;">
+        
+        {% if product.discount %}
+            <small><s>{{product.price}}</s></small>
+            <small>{{product.total_price}}</small>
+        {% else %}
+            <small>{{product.price}}</small>
+        {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+</main>
+{% endblock %}

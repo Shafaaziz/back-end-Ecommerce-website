@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Ecommerce{% endblock %}
+
+
+{% block body %}
+<h1>Home page</h1>
+
+{% for cat in sub_category %}
+<a style="text-decoration: none;" href="{{ cat.get_absolute_url }}">
+    <h1>{{cat.name}}</h1>
+    <!-- <img src="{{ category.image.url }}" alt=""> -->
+</a>
+{% endfor %}
+{% endblock %}

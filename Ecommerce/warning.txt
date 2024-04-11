@@ -1,0 +1,9 @@
+shop.views: 
+    email must change,
+    fail_silently=True
+
+account.views:
+    sms
+
+shop models:
+    slug
