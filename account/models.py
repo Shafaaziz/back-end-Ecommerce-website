@@ -43,7 +43,7 @@ class User(AbstractBaseUser):
 
     def __str__(self):
          return str(self.username)
-    def has_perm(self,perm,obj=True):
+    def has_perm(self,perm,obj=None):
         return True
     def has_module_perms(self,app_label):
         return True

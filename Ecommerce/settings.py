@@ -27,7 +27,11 @@ INSTALLED_APPS = [
 
     'account.apps.AccountConfig',
     'shop.apps.ShopConfig',
-    'django_jalali'
+    'sales_basket.apps.SalesBasketConfig',
+    'django_jalali',
+    'ckeditor',
+    'taggit',
+
 
 ]
 
@@ -119,6 +123,13 @@ LOGIN_URL = '/account/authentication/'
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media/'
+CKEDITOR_UPLOAD_PATH = 'ck/'
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar':'full'
+    }
+}
+TAGGIT_CASE_INSENSITIVE = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

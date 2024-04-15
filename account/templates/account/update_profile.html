@@ -22,7 +22,7 @@
                                 </div>
                                 <div class="col-lg-6 px-xl-10">
                                     <div class="bg-secondary d-lg-inline-block py-1-9 px-1-9 px-sm-6 mb-1-9 rounded">
-                                        <h3 class="h2 text-white mb-0">{{update.username}}</h3>
+                                        <h3 class="h2 text-white mb-0" name="username">{{update.username}}</h3>
                                         {% if user.is_admin %}
                                         <span class="text-primary">ادمین</span>
                                         {% else %}
@@ -30,10 +30,10 @@
                                         {% endif %}
                                     </div>
                                     <ul class="list-unstyled mb-1-9">
-                                        <li class="display-28"><span class="display-26 text-secondary me-2 font-weight-600">شماره همراه:</span> {{update.phone}}</li><br>
-                                        <li class="mb-2 mb-xl-3 display-28"><span class="display-26 text-secondary me-2 font-weight-600">ایمیل:</span> {{update.email}}</li>
-                                        <li class="mb-2 mb-xl-3 display-28"><span class="display-26 text-secondary me-2 font-weight-600">آدرس:</span> {{update.address}}</li>
-                                        <li class="mb-2 mb-xl-3 display-28"><span class="display-26 text-secondary me-2 font-weight-600">کد پستی:</span> {{update.IP_address}}</li>
+                                        <li class="display-28"><span class="display-26 text-secondary me-2 font-weight-600" name="phone">شماره همراه:</span> {{update.phone}}</li><br>
+                                        <li class="mb-2 mb-xl-3 display-28"><span class="display-26 text-secondary me-2 font-weight-600" name="email">ایمیل:</span> {{update.email}}</li>
+                                        <li class="mb-2 mb-xl-3 display-28"><span class="display-26 text-secondary me-2 font-weight-600" name="address">آدرس:</span> {{update.address}}</li>
+                                        <li class="mb-2 mb-xl-3 display-28"><span class="display-26 text-secondary me-2 font-weight-600" name="IP_address">کد پستی:</span> {{update.IP_address}}</li>
                                     </ul>
                                     <ul class="social-icon-style1 list-unstyled mb-0 ps-0">
                                         <li><a href="#!"><i class="ti-twitter-alt"></i></a></li>
@@ -41,7 +41,7 @@
                                         <li><a href="#!"><i class="ti-pinterest"></i></a></li>
                                         <li><a href="#!"><i class="ti-instagram"></i></a></li>
                                     </ul>
-                                    <a class='edit' type="submit" href="{% url 'profile' %}">اتمام</a>
+                                    <button class='edit' type="submit">اتمام</button>
                                 </div>
                             </div>
                         </div>
@@ -50,6 +50,5 @@
             </div>
         </div>
     </section>
-
 </form>
 {% endblock %}

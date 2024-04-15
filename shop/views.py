@@ -3,8 +3,10 @@ from django.views.decorators.http import require_http_methods
 from django.core.mail import EmailMessage
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from sales_basket.models import *
 from .models import *
 from .forms import *
+from django.db.models import Q
 
 def home(request):
     sub_category = Sub_Category.objects.all()
@@ -43,6 +45,9 @@ def detail(request,id):
     product = get_object_or_404(Product,id=id)
     comment_form = CommentForm()
     replyform = ReplyForm()
+    sales_basket = SalesForm()
+    images = ImageGallery.objects.filter(product_id=id)
+    similar = product.tags.similar_objects()[:2]
     comment = Comment.objects.filter(product_id=id,is_reply=False)
     is_like = False
     if product.like.filter(id=request.user.id).exists():
@@ -59,11 +64,11 @@ def detail(request,id):
             variant = Variant.objects.filter(product_variant_id=id)
             variants = Variant.objects.get(id=variant[0].id) 
         context = {'product':product, 'variant':variant,'variants':variants,'is_like':is_like,'is_unlike':is_unlike,'comment_form':comment_form,
-                   'comment':comment,'replyform':replyform}
+                   'comment':comment,'replyform':replyform,'images':images,'similar':similar,'sales_basket':sales_basket}
         return render(request, 'shop/detail.html',context)
     else:
         return render(request, 'shop/detail.html',{'product':product,'is_like':is_like,'is_unlike':is_unlike,'comment_form':comment_form,
-                        'comment':comment,'replyform':replyform})
+                        'comment':comment,'replyform':replyform,'images':images,'similar':similar,'sales_basket':sales_basket})
 
 @login_required
 def productLike(request,id):
@@ -116,13 +121,13 @@ def comment_reply(request,id,comment_id):
         return redirect(url)
     
 def product_search(request):
+    product = Product.objects.all()
     if request.method == 'POST':
-        product = Product.objects.all()
         form = SearchForm(request.POST)
         if form.is_valid():
-            data = form.cleaned_data
+            data = form.cleaned_data['search']
             if data is not None:
-                product = product.filter(name=data)
-            return render(request, 'shop/products.html',{'form':form})
+                product = product.filter(name__icontains=data)
+            return render(request, 'shop/products.html',{'product':product,'form':form})
 
 

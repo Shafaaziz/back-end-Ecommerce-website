@@ -8,7 +8,7 @@ class UserCreateForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'phone']
+        fields = ['phone', 'username', 'email']
     
     def clean_password2(self):
         data = self.cleaned_data
@@ -33,6 +33,11 @@ class UserChangeForm(forms.ModelForm):
     
 class authForm(forms.Form):
     phone = forms.CharField(max_length=11,min_length=11)
+
+    def clean_phone(self):
+        phone = self.cleaned_data['phone']
+        if User.objects.filter(phone=phone).exists():
+            raise forms.ValidationError('!شماره از قبل موجود است')
 
 class ProfileForm(forms.Form):
     username = forms.CharField(max_length=50)

@@ -2,13 +2,16 @@ from django.db import models
 from django.urls import reverse
 from account.models import *
 from django.forms import ModelForm
+from ckeditor.fields import RichTextField
+from taggit.managers import TaggableManager
+from django_jalali.db import models as jmodels
 
 
 class Category(models.Model):
     name = models.CharField(max_length=30,verbose_name='نام' ,unique=True)
     slug = models.SlugField(allow_unicode=True, unique=True,null=True,blank=True)
-    created_at = models.DateTimeField(auto_now_add=True,verbose_name='زمان ایجاد')
-    updated_at = models.DateTimeField(auto_now=True,verbose_name='آخرین تغییر')
+    created_at = jmodels.jDateTimeField(auto_now_add=True,verbose_name='زمان ایجاد')
+    updated_at = jmodels.jDateTimeField(auto_now=True,verbose_name='آخرین تغییر')
     class Meta:
         verbose_name = 'دسته بندی'
         verbose_name_plural = 'دسته بندی‌ها'
@@ -22,8 +25,8 @@ class Sub_Category(models.Model):
     category = models.ForeignKey(Category,on_delete=models.CASCADE,related_name='sub',verbose_name='ریز دسته بندی')
     name = models.CharField(max_length=40,unique=True)
     slug = models.SlugField(allow_unicode=True, unique=True,null=True,blank=True)
-    created_at = models.DateTimeField(auto_now_add=True,verbose_name='زمان ایجاد')
-    updated_at = models.DateTimeField(auto_now=True,verbose_name='آخرین تغییر')
+    created_at = jmodels.jDateTimeField(auto_now_add=True,verbose_name='زمان ایجاد')
+    updated_at = jmodels.jDateTimeField(auto_now=True,verbose_name='آخرین تغییر')
 
     class Meta:
         verbose_name = 'ریز دسته بندی' 
@@ -35,7 +38,6 @@ class Sub_Category(models.Model):
     
 class Product(models.Model):
     VARIANT = (
-        ('هیچ کدام','هیچ کدام'),
         ('سایز','سایز'),
         ('رنگ','رنگ'),
     )
@@ -46,12 +48,13 @@ class Product(models.Model):
     price = models.PositiveIntegerField(verbose_name='قیمت')
     discount = models.PositiveIntegerField(verbose_name='تخفیف',blank=True,null=True)
     total_price = models.PositiveIntegerField(verbose_name='قیمت نهایی')
-    information = models.TextField(blank=True,null=True,verbose_name='جزئیات محصول')
+    information = RichTextField(blank=True,null=True,verbose_name='جزئیات محصول')
     image = models.ImageField(upload_to='product/',verbose_name='عکس')
     status = models.CharField(null=True,blank=True,max_length=50,choices=VARIANT)
     available = models.BooleanField(default=True,verbose_name='موجودی')
-    created_at = models.DateTimeField(auto_now_add=True,verbose_name='زمان ایجاد')
-    updated_at = models.DateTimeField(auto_now=True,verbose_name='آخرین تغییر')
+    created_at = jmodels.jDateTimeField(auto_now_add=True,verbose_name='زمان ایجاد')
+    updated_at = jmodels.jDateTimeField(auto_now=True,verbose_name='آخرین تغییر')
+    tags = TaggableManager(blank=True)
     like = models.ManyToManyField(User,blank=True,related_name='product_like')
     total_like = models.IntegerField(default=0)
     unlike = models.ManyToManyField(User,blank=True,related_name='product_unlike')
@@ -84,7 +87,7 @@ class Product(models.Model):
     #         return self.available == False
 
 class Size(models.Model):
-    name = models.CharField(unique=True,max_length=3,verbose_name='سایز')
+    name = models.CharField(max_length=3,verbose_name='سایز')
 
     class Meta:
         verbose_name = 'سایز'
@@ -93,7 +96,7 @@ class Size(models.Model):
         return self.name
 
 class Color(models.Model):
-    name = models.CharField(unique=True, max_length=40, verbose_name='نام رنگ')
+    name = models.CharField(max_length=40, verbose_name='نام رنگ')
 
     class Meta:
         verbose_name = 'رنگ'
@@ -132,7 +135,7 @@ class Comment(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     comment = models.TextField()
     rate = models.PositiveIntegerField(default=1)
-    create_at = models.DateTimeField(auto_now_add=True)
+    create_at = jmodels.jDateTimeField(auto_now_add=True)
     reply = models.ForeignKey('self',on_delete=models.CASCADE,null=True,blank=True,related_name='comment_reply')
     is_reply = models.BooleanField(default=False)
 

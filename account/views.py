@@ -9,24 +9,27 @@ from random import randint
 # import requests
 
 
-@require_http_methods(request_method_list=('GET','POST'))
+# @require_http_methods(request_method_list=('GET','POST'))
 def authentication(request):
-    form = authForm(request.POST)
-    if form.is_valid():
-        data = form.cleaned_data
-        phone = f"0{data['phone']}"
-        if User.objects.filter(phone=data['phone']).exists():
-            user = authenticate(request, phone=phone)
-            login(request, user)
-            return redirect('home')
-        else:
-            random_code = randint(10000,99999)
-            # sms = ghasedakpack.Ghasedak("Your APIKEY")
-            # sms.send({'message': 'کد اعتبار سنجی فروشگاه شما: '+ random_code, 'receptor' : phone, 'linenumber': '300085858' })
-            user = User.objects.create_user(phone=data['phone'],)
-            user.save()
-            messages.success(request, 'You made it')
-            return redirect('home')
+    if request.method == 'POST':
+        form = authForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            # phone = f"0{data['phone']}"
+            if User.objects.filter(phone=data['phone']).exists():
+                user = authenticate(request, phone=data['phone'])
+                login(request, user)
+                return redirect('home')
+            else:
+                # random_code = randint(10000,99999)
+                # sms = ghasedakpack.Ghasedak("Your APIKEY")
+                # sms.send({'message': 'کد اعتبار سنجی فروشگاه شما: '+ random_code, 'receptor' : phone, 'linenumber': '300085858' })
+                user = User.objects.create_user(phone=data['phone'],)
+                user.save()
+                messages.success(request, 'You made it')
+                return redirect('home')
+    else:
+        form = authForm()
     return render(request, 'account/authentication.html',{'form':form})
 
 def Profile(request):
@@ -34,11 +37,14 @@ def Profile(request):
     return render(request, 'account/profile.html', {'profile':profile})
 
 
-@require_http_methods(request_method_list=('GET','POST'))
+# @require_http_methods(request_method_list=('GET','POST'))
 def update_profile(request):
-    update = Update_ProfileForm(request.POST,instance=request.user)
-    if update.is_valid():
-        update.save()
-        messages.success(request, '.اطلاعات کاربری شما بروزرسانی شد')
-        return redirect('profile')
+    if request.method == 'POST':
+        update = Update_ProfileForm(request.POST,instance=request.user)
+        if update.is_valid():
+            update.save()
+            messages.success(request, '.اطلاعات کاربری شما بروزرسانی شد')
+            return redirect('profile')
+    else:
+        update = Update_ProfileForm(instance=request.user)
     return render(request, 'account/update_profile.html',{'update':update})

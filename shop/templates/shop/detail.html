@@ -22,30 +22,93 @@
     <!-- Right Column -->
     <div class="right-column">
    
-      <!-- Product Description -->
+      <!------------- Product Description --------------->
       <div class="product-description">
         <span>{{category}}</span>
         <h1>{{product.name}}</h1>
       </div>
-      <p>{{ product.information }}</p>
+      <p>{{ product.information|safe }}</p>
       <div>
+
+        <!---------------- VAriant --------------------->
         {% if product.status == 'سایز' %}
           <form method="POST" style="display: flex;">
             {% csrf_token %}
             <h5 style="margin-left: 10px; margin-top: 10px;">  سایز:</h5>
-            <select style="background-color: darkcyan; border-radius: 10%; border: 1px solid;" name="size" id="size">
+            <!-- <select style="background-color: darkcyan; border-radius: 10%; border: 1px solid;" name="size" id="size"> -->
             {% for data in variant %}
-              <option value="{{data.id}}" {% if variants.id == data.id %} checked{% endif %} name="selected" onchange="this.form.submit();">{{data.size_variant}}</option>
+              <!-- <option value="{{data.id}}" {% if variants.id == data.id %} checked {% endif %} name="selected" onchange="this.form.submit();">{{data.size_variant}}</option> -->
+              <input type="radio" value="{{data.id}}" {% if variants.id == data.id %} checked {% endif %} name="selected" onchange="this.form.submit();">
+              <a>{{data.size_variant}}</a>
             {% endfor %}
-            </select>            
+            <!-- </select>             -->
           </form>
         {% endif %}
 
+
+
+        <div class="row">
+          {% for img in images %}
+            <img src="{{img.image.url}}" style="width: 70px; height: 70px;">
+          {% endfor %}
+        </div>
+
+
+        <!------------------ Price ---------------------->
+
+
+
       <div class="product-price">
-        <span>قیمت: {{product.price}} تومان</span>
-        <a href="#" class="cart-btn"> سبد خرید</a>
+        {% if variants != None %}
+          {% if variants.discount %}
+          <div>
+            <small><s>{{variants.price}}</s></small>
+            <span>{{variants.total_price}} تومان</span>
+          </div>
+          {% else %}
+            <span>{{variants.total_price}} تومان</span>
+          {% endif %}
+
+        {% else %}
+          {% if product.discount %}
+          <div>
+            <small><s>{{product.price}}</s></small>
+            <span>{{product.total_price}} تومان</span>
+          </div>
+          {% else %}
+            <span>{{product.total_price}} تومان</span>
+          {% endif %}
+        {% endif %}
       </div>
 
+
+      <!------------------ Sale Form -------------------->
+
+
+      <div class="card" style="margin-bottom: 20px;">
+        {% if product.status != None %}
+          <form method="POST" action="{% url 'sale:add_basket' product.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="selected" value="{{variants.id}}">
+            <input type="number" name="quantity" min="1" value="1" max="{{variants.amount}}" required oninvalid="setCustomValidity('تعداد بیشتر از {{product.amount}} در انبار موجود نیست.')">
+            {{message}}
+            <button class="cart-btn" type="submit" style="font-size: 15px;">سبد خرید <i class="fa fa-shopping-basket" aria-hidden="true"></i>
+            </button>
+          </form>
+        {% else %}
+          <form method="POST" action="{% url 'sale:add_basket' product.id %}">
+            {% csrf_token %}
+            <input type="number" name="quantity" min="1" value="1" max="{{product.amount}}" required oninvalid="setCustomValidity('تعداد بیشتر از {{product.amount}} در انبار موجود نیست.')">
+            {{message}}
+            <button class="cart-btn" type="submit" style="font-size: 15px;">سبد خرید <i class="fa fa-shopping-basket" aria-hidden="true"></i>
+            </button>
+          </form>
+      </div>
+
+      {% endif %}
+
+
+      <!------------------------- Like --------------------------->
 
       <small>{{product.total_like}}</small>
         {% if is_like %}
@@ -132,6 +195,18 @@
     {% endfor %}
       
     </div>
-  </main>
 
+  </main>
+  <footer>
+    <hr>
+    <div class="similar">
+        {% for tag in similar %}
+        <a href="{% url 'detail' tag.id %}">
+          <h5>{{tag.name}}</h5>
+          <img src="{{ tag.image.url}}" alt="similar-product">
+          <small>{{tag.price}}</small>
+        </a>
+        {% endfor %}
+    </div>
+  </footer>
 {% endblock %}

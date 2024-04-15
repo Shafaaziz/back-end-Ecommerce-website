@@ -8,8 +8,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/fontawesome.min.css">
     {% block links %}{% endblock %}
     <title>{% block title %}{% endblock %}</title>
+    
 </head>
 <body dir="rtl">
+  {% include 'messages.html' %}
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
           <a class="navbar-brand" href="{% url 'product' %}">محصولات</a>
@@ -33,6 +35,9 @@
                 {% else %}
                   <a class="nav-link " href="{% url 'auth' %}">ورود کاربر</a>
                 {% endif %}
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="{% url 'sale:sales_basket' %}">سبد خرید</a>
               </li>
             </ul>
           </div>
