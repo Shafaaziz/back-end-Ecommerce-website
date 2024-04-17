@@ -126,10 +126,8 @@
       </div>
       <!-- Comment Form -->
       {% for comment in comment %}
-      <p>{{comment.comment}}</p>
-      <small>{{comment.rate}}</small>
       {% endfor %}
-      <div class="row comment">
+      <div class="row comment" style="display: block;">
         <div class="col-6">
           <form method="POST" action="{% url 'product_comment' product.id %}">
             {% csrf_token %}

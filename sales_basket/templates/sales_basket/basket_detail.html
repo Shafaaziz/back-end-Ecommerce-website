@@ -6,78 +6,114 @@
 {% block body %}
 
 <div class="container">
-    <table class="table table-striped table-dark" style="border: 3px solid;">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">عکس</th>
-            <th scope="col">محصول</th>
-            <th scope="col">سایز</th>
-            <th scope="col">رنگ</th>
-            <th scope="col">تخفیف</th>
-            <th scope="col">قیمت با اعمال تخفیف</th>
-            <th scope="col">تعداد</th>
-            <th scope="col">قیمت نهایی</th>
-            <th scope="col">حذف</th>
-          </tr>
-        </thead>
-        <tbody class="table-group-divider">
-        {% for basket in basket %}
-          <tr>
-            <th scope="row">{{forloop.counter}}</th>
-            <td><img src="{{basket.product.image.url}}" style="width: 100px; height: 100px;"></td>
-            <td>{{basket.product.name}}</td>
-            <td>{{basket.variant.size_variant.name}}</td>
-            <td>{{basket.variant.color_variant.name}}</td>
-
-            <!-- discount -->
-            <td>
-                {% if basket.product.status != None %}
-                    {% if basket.variant.discount %}
-                        {{basket.variant.discount}}%
+    <div class="row">
+        <table class="table table-striped table-dark" style="border: 3px solid;">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">عکس</th>
+                <th scope="col">محصول</th>
+                <th scope="col">سایز</th>
+                <th scope="col">رنگ</th>
+                <th scope="col">تخفیف</th>
+                <th scope="col">قیمت با اعمال تخفیف</th>
+                <th scope="col">تعداد</th>
+                <th scope="col">قیمت نهایی</th>
+                <th scope="col">حذف</th>
+              </tr>
+            </thead>
+            <tbody class="table-group-divider">
+            {% for basket in basket %}
+              <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td><img src="{{basket.product.image.url}}" style="width: 100px; height: 100px;"></td>
+                <td>{{basket.product.name}}</td>
+                <td>{{basket.variant.size_variant.name}}</td>
+                <td>{{basket.variant.color_variant.name}}</td>
+    
+                <!-- discount -->
+                <td>
+                    {% if basket.product.status != None %}
+                        {% if basket.variant.discount %}
+                            {{basket.variant.discount}}%
+                        {% else %}
+                            <small>0</small>
+                        {% endif %}
                     {% else %}
-                        <small>0</small>
+                        {% if basket.product.discount %}
+                            {{basket.product.discount}}%
+                        {% else %}
+                            <small>0</small>
+                        {% endif %}
                     {% endif %}
-                {% else %}
-                    {% if basket.product.discount %}
-                        {{basket.product.discount}}%
+                </td>
+    
+                <!-- total discount price -->
+                <td>
+                    {% if basket.product.status != None %}
+                        {{basket.variant.total_price}}
                     {% else %}
-                        <small>0</small>
+                        {{basket.product.total_price}}
                     {% endif %}
-                {% endif %}
-            </td>
+                </td>
+    
+                <td>{{basket.quantity}}</td>
+                <!-- total price -->
+                <td>
+                    {% if basket.product.status != None %}
+                        {% widthratio basket.variant.total_price 1 basket.quantity %}
+                    {% else %}
+                    {% widthratio basket.product.total_price 1 basket.quantity %}
+                    {% endif %}
+                </td>
+    
+                <td>
+                    <a href="{% url 'sale:remove_basket' basket.id %}"><i class="fa fa-trash"></i></a>
+                </td>
+              </tr> 
+    
+            {% endfor %}
+            <tr>
+                <td style="background-color: #990000;color: white;" colspan="8">جمع کل:</td>
+                <td style="background-color: #990000;color: white;" colspan="8">{{total}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
-            <!-- total discount price -->
-            <td>
-                {% if basket.product.status != None %}
-                    {{basket.variant.total_price}}
-                {% else %}
-                    {{basket.product.total_price}}
-                {% endif %}
-            </td>
 
-            <td>{{basket.quantity}}</td>
-            <!-- total price -->
-            <td>
-                {% if basket.product.status != None %}
-                    {% widthratio basket.variant.total_price 1 basket.quantity %}
-                {% else %}
-                {% widthratio basket.product.total_price 1 basket.quantity %}
-                {% endif %}
-            </td>
+    <div class="row">
+        <style>
+            label{
+                margin: 3px 10px;
+            }
+        </style>
+        <form method="POST" action="{% url 'sale:order_create' %}">
+            {% csrf_token %}
+            <div class="card" style="padding: 15px; margin: 10px; background-color: darkcyan;">
+                <label for="first_name">نام گیرنده
+                <input type="text" name="first_name" value="{{user.first_name}}" required oninvalid="setCustomValidity('این قسمت را پر کنید')">
+                </label>
+                <label for="last_name">نام خانوادگی
+                <input type="text" name="last_name" value="{{user.last_name}}" required oninvalid="setCustomValidity('این قسمت را پر کنید')">
+                </label>
+                <label for="phone">شماره همراه
+                <input type="number" name="phone" value="{{user.phone}}" required oninvalid="setCustomValidity('این قسمت را پر کنید')">
+                </label>
+                <label for="email">ایمیل
+                <input type="text" name="email" value="{{user.email}}" required oninvalid="setCustomValidity('این قسمت را پر کنید')">
+                </label>
+                <label for="address">آدرس
+                <input type="text" name="address" value="{{user.address}}" required oninvalid="setCustomValidity('این قسمت را پر کنید')">
+                </label>
+                <label for="IP_address">کد پستی
+                <input type="text" name="IP_address" value="{{user.IP_address}}" required oninvalid="setCustomValidity('این قسمت را پر کنید')">
+                </label>
+            </div>
+            <button type="submit" class="btn btn-outline-danger mt-4" ><b>سفارش</b></button>
+        </form>
+    </div>
 
-            <td>
-                <a href="{% url 'sale:remove_basket' basket.id %}"><i class="fa fa-trash"></i></a>
-            </td>
-          </tr> 
-
-        {% endfor %}
-        <tr>
-            <td style="background-color: #990000;color: white;" colspan="8">جمع کل:</td>
-            <td style="background-color: #990000;color: white;" colspan="8">{{total}}</td>
-        </tr>
-        </tbody>
-    </table>
 </div>
 
 {% endblock %}
