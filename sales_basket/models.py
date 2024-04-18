@@ -37,8 +37,18 @@ class Order(models.Model):
     paid = models.BooleanField(default=False,verbose_name='پرداخت شد؟')
     created_at = jmodels.jDateTimeField(auto_now_add=True,verbose_name='زمان ایجاد')
 
+
     def __str__(self):
         return self.user.username
+    
+    def get_price(self):
+        total = sum(i.price() for i in self.order_item.all())
+        if self.discount:
+            discount_price = (self.discount / 100) * total
+            return int(total - discount_price)
+        return total
+    
+
     
 class ItemOrder(models.Model):
     order = models.ForeignKey(Order,on_delete=models.CASCADE,verbose_name='سفارش',related_name='order_item')

@@ -4,6 +4,10 @@ from .models import *
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from suds import Client
+from django.conf import settings
+import requests
+import json
 
 
 @login_required
@@ -83,3 +87,71 @@ def order_create(request):
             ItemOrder.objects.create(order_id=order.id,user_id=request.user.id,product_id=basket.product_id,
                                      variant_id=basket.variant_id,quantity=basket.quantity)
         return redirect('sale:order',order.id)
+    
+
+
+
+
+
+if settings.SANDBOX:
+    sandbox = 'sandbox'
+else:
+    sandbox = 'www'
+
+
+ZP_API_REQUEST = f"https://{sandbox}.zarinpal.com/pg/rest/WebGate/PaymentRequest.json"
+ZP_API_VERIFY = f"https://{sandbox}.zarinpal.com/pg/rest/WebGate/PaymentVerification.json"
+ZP_API_STARTPAY = f"https://{sandbox}.zarinpal.com/pg/StartPay/"
+
+
+description = "تراکنش شما با موفقیت انجام شد"
+CallbackURL = 'http://127.0.0.1:8080/sale:verify/'
+
+
+def send_request(request,price):
+    global amount
+    amount = price
+    phone = str(request.user.phone)
+    data = {
+        "MerchantID": settings.MERCHANT,
+        "Amount": amount,
+        "Description": description,
+        "Phone": phone,
+        "CallbackURL": CallbackURL,
+    }
+    data = json.dumps(data)
+    headers = {'content-type': 'application/json', 'content-length': str(len(data)) }
+    try:
+        response = requests.post(ZP_API_REQUEST, data=data,headers=headers, timeout=10)
+
+        if response.status_code == 200:
+            response = response.json()
+            if response['Status'] == 100:
+                return {'status': True, 'url': ZP_API_STARTPAY + str(response['Authority']), 'authority': response['Authority']}
+            else:
+                return {'status': False, 'code': str(response['Status'])}
+        return response
+    
+    except requests.exceptions.Timeout:
+        return {'status': False, 'code': 'timeout'}
+    except requests.exceptions.ConnectionError:
+        return {'status': False, 'code': 'connection error'}
+
+
+def verify(authority):
+    data = {
+        "MerchantID": settings.MERCHANT,
+        "Amount": amount,
+        "Authority": authority,
+    }
+    data = json.dumps(data)
+    headers = {'content-type': 'application/json', 'content-length': str(len(data)) }
+    response = requests.post(ZP_API_VERIFY, data=data,headers=headers)
+
+    if response.status_code == 200:
+        response = response.json()
+        if response['Status'] == 100:
+            return {'status': True, 'RefID': response['RefID']}
+        else:
+            return {'status': False, 'code': str(response['Status'])}
+    return response

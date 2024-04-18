@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'django_jalali',
     'ckeditor',
     'taggit',
+    'sorl.thumbnail',
 
 
 ]
@@ -130,6 +131,14 @@ CKEDITOR_CONFIGS = {
     }
 }
 TAGGIT_CASE_INSENSITIVE = True
+
+
+
+
+MERCHANT = "00000000-0000-0000-0000-000000000000"
+
+SANDBOX = True
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

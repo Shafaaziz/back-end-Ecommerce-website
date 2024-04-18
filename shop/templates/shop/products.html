@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
-
+{% load thumbnail %}
 
 {% block title %}محصولات{% endblock %}
 
 
 {% block body %}
+
 <main>
     <div class="container">
         <form method="POST", action="{% url 'product_search' %}">
@@ -17,7 +18,9 @@
         <a style="text-decoration: none;" href="{% url 'detail' product.id %}">
         <h2>{{product.name}}</h2>
         
-        <img src="{{ product.image.url }}" style="width: 200px ;">
+        {% thumbnail product.image '100x100' as img %}
+        <img src="{{ img.url }}" style="width: 200px ;">
+        {% endthumbnail %}
         
         {% if product.discount %}
             <small><s>{{product.price}}</s></small>
