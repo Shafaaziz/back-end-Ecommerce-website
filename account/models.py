@@ -26,7 +26,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser):
     username = models.CharField(max_length=50,verbose_name='نام کاربری',null=True,blank=True)
     email = models.EmailField(null=True,blank=True,verbose_name='ایمیل')
-    phone = models.CharField(unique=True,verbose_name='شماره همراه',max_length=11)
+    phone = models.CharField(unique=True,max_length=11,verbose_name='شماره همراه')
     address = models.TextField(null=True,blank=True,verbose_name='آدرس')
     IP_address = models.PositiveIntegerField(null=True,blank=True,verbose_name='کد پستی')
     is_active = models.BooleanField(default=True,verbose_name='حساب کاربری فعال')

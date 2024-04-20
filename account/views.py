@@ -1,50 +1,57 @@
-from django.shortcuts import render,redirect
-from django.views.decorators.http import require_http_methods
+from django.shortcuts import render,redirect,get_object_or_404
+from django.contrib.auth import login,authenticate
+from django.db.models.base import Model as Model
+from django.db.models.query import QuerySet
 from django.contrib import messages
-from django.contrib.auth import login,logout,authenticate
 from .forms import *
 from .models import *
 from random import randint
+from django.views import View
+from django.contrib.auth.decorators import login_required
+from django.views.generic import DetailView,UpdateView
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 # import ghasedakpack
 # import requests
 
 
-# @require_http_methods(request_method_list=('GET','POST'))
-def authentication(request):
-    if request.method == 'POST':
-        form = authForm(request.POST)
+
+class authentication(View):
+    template_name = 'account/authentication.html'
+    form_class = authForm
+
+    def get(self,request,*args,**kwargs):
+        return render(request,self.template_name,{'form':self.form_class})
+    
+    def post(self,request,*args,**kwargs):
+        form = self.form_class(request.POST)
         if form.is_valid():
             data = form.cleaned_data
-            # phone = f"0{data['phone']}"
-            if User.objects.filter(phone=data['phone']).exists():
-                user = authenticate(request, phone=data['phone'])
-                login(request, user)
+            if User.objects.filter(phone=data).exists():
+                user = authenticate(request, phone=data)
+                login(request,user)
                 return redirect('home')
             else:
                 # random_code = randint(10000,99999)
                 # sms = ghasedakpack.Ghasedak("Your APIKEY")
                 # sms.send({'message': 'کد اعتبار سنجی فروشگاه شما: '+ random_code, 'receptor' : phone, 'linenumber': '300085858' })
-                user = User.objects.create_user(phone=data['phone'],)
+                user = User.objects.create_user(phone=data)
                 user.save()
-                messages.success(request, 'You made it')
                 return redirect('home')
-    else:
-        form = authForm()
-    return render(request, 'account/authentication.html',{'form':form})
+        return render(request,self.template_name,{'form':self.form_class})
 
+
+@login_required
 def Profile(request):
-    profile = User.objects.get(username=request.user)
+    profile = get_object_or_404(User,username=request.user)
     return render(request, 'account/profile.html', {'profile':profile})
 
 
-# @require_http_methods(request_method_list=('GET','POST'))
-def update_profile(request):
-    if request.method == 'POST':
-        update = Update_ProfileForm(request.POST,instance=request.user)
-        if update.is_valid():
-            update.save()
-            messages.success(request, '.اطلاعات کاربری شما بروزرسانی شد')
-            return redirect('profile')
-    else:
-        update = Update_ProfileForm(instance=request.user)
-    return render(request, 'account/update_profile.html',{'update':update})
+class update_profile(LoginRequiredMixin,UpdateView):
+    template_name = 'account/update_profile.html'
+    fields = ['username', 'phone','email','address','IP_address']
+    success_url = reverse_lazy('profile')
+
+    def get_object(self):
+        querySet = get_object_or_404(User,id=self.request.user.id)
+        return querySet

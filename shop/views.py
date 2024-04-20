@@ -7,10 +7,14 @@ from sales_basket.models import *
 from .models import *
 from .forms import *
 from django.db.models import Q
+from django.views.generic import ListView
 
-def home(request):
-    sub_category = Sub_Category.objects.all()
-    return render(request, 'shop/home.html', {'sub_category':sub_category})
+
+
+class home(ListView):
+    model = Sub_Category
+    template_name = 'shop/home.html'
+    context_object_name = 'sub_category'
 
 @login_required
 def contact(request):

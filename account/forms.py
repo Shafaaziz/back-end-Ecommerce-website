@@ -32,7 +32,7 @@ class UserChangeForm(forms.ModelForm):
         return self.initial['password']
     
 class authForm(forms.Form):
-    phone = forms.CharField(max_length=11,min_length=11)
+    phone = forms.CharField(max_length=11)
 
     def clean_phone(self):
         phone = self.cleaned_data['phone']
@@ -45,10 +45,3 @@ class ProfileForm(forms.Form):
     email = forms.EmailField()
     address = forms.Textarea()
     IP_address = forms.IntegerField()
-
-class Update_ProfileForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['username', 'phone','email','address','IP_address']
-
-
